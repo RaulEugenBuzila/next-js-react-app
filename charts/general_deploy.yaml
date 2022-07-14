@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: #{SERVICE_NAME}#-#{STAGE}#
+  namespace: foundation
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: #{GIT_REPO}#
+    targetRevision: "#{Build.SourceVersion}#"
+    path: charts/service
+    helm:
+      parameters:
+        # template variables
+        - name: "image.tag"
+          value: "#{Build.BuildNumber}#"
+        - name: "image.repository"
+          value: "#{DOCKER_REPO}#"
+        - name: "ingress.host"
+          value: "#{ENDPOINT}#"
+        - name: "ingress.path"
+          value: "#{PATH}#"
+        - name: "ingress.tls.secretName"
+          value: "#{INGRESS_SECRET_NAME}#"
+        - name: "ingress.rewriteTarget"
+          value: "#{REWRITE_TARGET}#"
+        - name: "ingress.pathSuffix"
+          value: "#{PATH_SUFFIX}#"
+        - name: "replicaCount"
+          value: "#{REPLICA_COUNT}#"
+        - name: "ingress.enabled"
+          value: "#{INGRESS_ENABLED}#"
+        # service variables
+        - name: "environment.RUNNING_CONTAINER"
+          value: "true"
+        - name: "environment.STAGE"
+          value: "#{STAGE}#"
+       
+      valueFiles:
+        - values.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: #{K8S_NAMESPACE}#
+
+  # Sync policy
+  syncPolicy:
+    automated:
+      prune: true # Specifies if resources should be pruned during auto-syncing ( false by default ).
+      selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).

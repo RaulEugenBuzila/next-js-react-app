@@ -1,0 +1,15 @@
+replicaCount: 1
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true # true/false
+  rewriteTarget: /$ # /$
+  host: "" # example.com
+  path: "" # e.g. productidservice
+  pathSuffix: "" # e.g. (/|$)(.*)
+  tls:
+    secretName: "" # <= for DEV, wildcard-uat-letsencrypt-prod for UAT

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+data:
+  RUNNING_CONTAINER: '{{ .Values.environment.RUNNING_CONTAINER }}'
+  STAGE: '{{ .Values.environment.STAGE }}'
